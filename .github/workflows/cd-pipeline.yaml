@@ -55,42 +55,42 @@ jobs:
         with:
           script: |
               core.setFailed('${{ steps.get-chart.outputs.error }}')
-  vib-publish:
-    runs-on: ubuntu-latest
-    needs: get-chart
-    if: ${{ needs.get-chart.outputs.result == 'ok' }}
-    name: VIB Publish
-    steps:
-      - uses: actions/checkout@v3
-        name: Checkout Repository
-        with:
-          path: charts
-      - id: get-asset-vib-config
-        name: Get asset-specific configuration for VIB action
-        run: |
-          config_file="charts/.vib/${{ needs.get-chart.outputs.chart }}/vib-action.config"
-          # Supported configuration customizations and default values
-          verification_mode="PARALLEL"
-          if [[ -f $config_file ]]; then
-            verification_mode="$(cat $config_file | grep 'verification-mode' | cut -d'=' -f2)"
-          fi
-          echo "verification_mode=${verification_mode}" >> $GITHUB_OUTPUT
-      - uses: vmware-labs/vmware-image-builder-action@main
-        name: Verify and publish ${{ needs.get-chart.outputs.chart }}
-        with:
-          pipeline: ${{ needs.get-chart.outputs.chart }}/vib-publish.json
-          config: charts/.vib/
-          verification-mode: ${{ steps.get-asset-vib-config.outputs.verification_mode }}
-        env:
-          VIB_ENV_TARGET_PLATFORM: ${{ secrets.VIB_ENV_TARGET_PLATFORM }}
-          VIB_ENV_ALTERNATIVE_TARGET_PLATFORM: ${{ secrets.VIB_ENV_ALTERNATIVE_TARGET_PLATFORM }}
-          VIB_ENV_S3_URL: s3://${{ secrets.AWS_S3_BUCKET }}/bitnami
-          VIB_ENV_S3_USERNAME: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          VIB_ENV_S3_PASSWORD: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#  vib-publish:
+#    runs-on: ubuntu-latest
+#    needs: get-chart
+#    if: ${{ needs.get-chart.outputs.result == 'ok' }}
+#    name: VIB Publish
+#    steps:
+#      - uses: actions/checkout@v3
+#        name: Checkout Repository
+#        with:
+#          path: charts
+#      - id: get-asset-vib-config
+#        name: Get asset-specific configuration for VIB action
+#        run: |
+#          config_file="charts/.vib/${{ needs.get-chart.outputs.chart }}/vib-action.config"
+#          # Supported configuration customizations and default values
+#          verification_mode="PARALLEL"
+#          if [[ -f $config_file ]]; then
+#            verification_mode="$(cat $config_file | grep 'verification-mode' | cut -d'=' -f2)"
+#          fi
+#          echo "verification_mode=${verification_mode}" >> $GITHUB_OUTPUT
+#      - uses: vmware-labs/vmware-image-builder-action@main
+#        name: Verify and publish ${{ needs.get-chart.outputs.chart }}
+#        with:
+#          pipeline: ${{ needs.get-chart.outputs.chart }}/vib-publish.json
+#          config: charts/.vib/
+#          verification-mode: ${{ steps.get-asset-vib-config.outputs.verification_mode }}
+#        env:
+#          VIB_ENV_TARGET_PLATFORM: ${{ secrets.VIB_ENV_TARGET_PLATFORM }}
+#          VIB_ENV_ALTERNATIVE_TARGET_PLATFORM: ${{ secrets.VIB_ENV_ALTERNATIVE_TARGET_PLATFORM }}
+#          VIB_ENV_S3_URL: s3://${{ secrets.AWS_S3_BUCKET }}/bitnami
+#          VIB_ENV_S3_USERNAME: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#          VIB_ENV_S3_PASSWORD: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
   update-index:
     runs-on: ubuntu-latest
-    needs:
-      - vib-publish
+#    needs:
+#      - vib-publish
     name: Update charts index
     steps:
       - uses: actions/download-artifact@v3
